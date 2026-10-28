@@ -1,0 +1,62 @@
+# Tag-gesteuertes Windows-Zip-Release für juricane (Fork).
+# Trigger: git tag v1.2.3 && git push origin v1.2.3
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows-zip:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Windows zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # --win zip: gezipptes build-Ergebnis (kein NSIS-Setup)
+        # --publish never: Upload übernimmt der Release-Schritt unten
+        run: yarn build && npx electron-builder build --win zip --x64 --publish never
+
+      - name: Collect artifacts
+        id: artifacts
+        shell: pwsh
+        run: |
+          $dir = "release/build"
+          if (-not (Test-Path $dir)) { throw "Build output missing: $dir" }
+          Get-ChildItem $dir -Recurse -File | Select-Object FullName, Length
+          $zips = @(Get-ChildItem $dir -Filter "*.zip" -File -ErrorAction SilentlyContinue)
+          if ($zips.Count -eq 0) {
+            throw "No .zip found under $dir"
+          }
+          "zip_count=$($zips.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Bei Tag-Push: Tag-Name. Bei workflow_dispatch: run-id als Fallback-Name.
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('manual-{0}', github.run_id) }}
+          name: ${{ github.ref_type == 'tag' && github.ref_name || format('Manual build {0}', github.run_id) }}
+          draft: false
+          generate_release_notes: true
+          files: |
+            release/build/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
