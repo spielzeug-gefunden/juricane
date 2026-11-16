@@ -6,10 +6,13 @@ import ListIcon from '@mui/icons-material/List';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import PeopleIcon from '@mui/icons-material/People';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SettingsIcon from '@mui/icons-material/Settings';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button, ButtonGroup } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useConfig } from 'renderer/app/queries';
 import { toggleAdminMode } from 'renderer/slices/admin-slice';
 import to from 'renderer/utils/to';
@@ -40,6 +43,8 @@ export default function Header() {
   };
   const navigate = useNavigate();
   const adminMode = useSelector(selectAdminMode);
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
   const dispatch = useDispatch();
   const { data: config } = useConfig();
 
@@ -50,6 +55,13 @@ export default function Header() {
       dispatch(toggleAdminMode());
     }
   };
+
+  // Beim Verlassen des Admin-Modus (auch per Timeout) die Admin-Seite verlassen
+  useEffect(() => {
+    if (!adminMode && pathname.startsWith('/admin')) {
+      navigate('/playing', { replace: true });
+    }
+  }, [adminMode, pathname, navigate]);
 
   const navigateBackToWaitlist = () => {
     navigate(getPathFromTab(tabs[0].name));
@@ -105,6 +117,27 @@ export default function Header() {
             >
               <SearchIcon />
             </Button>
+            {adminMode && (
+              <Button
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...to('/admin', NavLink)}
+                // @ts-ignore
+                style={({ isActive }) => ({
+                  color: isActive ? 'white' : undefined,
+                  backgroundColor: isActive
+                    ? 'rgba(255, 255, 255, 0.04)'
+                    : undefined,
+                })}
+                sx={{
+                  p: 2,
+                  fontSize: 16,
+                  transition: 'color 0.2s ease',
+                }}
+              >
+                <SettingsIcon sx={{ mr: 1 }} />
+                {t('components.admin_page.nav')}
+              </Button>
+            )}
           </Box>
         </Box>
       </Box>

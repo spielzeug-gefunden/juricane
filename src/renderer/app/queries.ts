@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import Config from 'config';
 import { OwnPlaylist, OwnPlaylistConfig } from 'renderer/types';
 
 export const useConfig = () => {
@@ -13,6 +14,39 @@ export const useConfig = () => {
       refetchOnWindowFocus: false,
     }
   );
+};
+
+export const useImportConfig = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => window.electron.ipcRenderer.importConfig(),
+    onSuccess: (data) => {
+      if (data) queryClient.setQueryData(['config'], data);
+    },
+  });
+};
+
+export const useCreateDefaultConfig = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => window.electron.ipcRenderer.createDefaultConfig(),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['config'], data);
+    },
+  });
+};
+
+export const useSaveConfig = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: Config) => window.electron.ipcRenderer.saveConfig(data),
+    onSuccess: (data) => {
+      queryClient.setQueryData(['config'], data);
+    },
+  });
 };
 
 export const useMusicLibrary = () => {

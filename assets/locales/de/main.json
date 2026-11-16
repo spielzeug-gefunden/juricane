@@ -3,7 +3,12 @@
   "components": {
     "not_loaded": {
       "text": "Loading track database...",
-      "button_text": "Open playlist folder"
+      "button_text": "Open playlist folder",
+      "no_config_title": "Keine Konfiguration gefunden",
+      "no_config_text": "Es wurde keine config.json gefunden. Möchten Sie eine vorhandene Datei importieren oder eine neue Konfiguration anlegen?",
+      "import": "Datei importieren",
+      "create_new": "Neu anlegen",
+      "error": "Die Konfiguration konnte nicht geladen werden."
     },
     "track_list": {
       "title": "Title",
@@ -28,6 +33,36 @@
       "password": "Passwort",
       "cancel": "Abbrechen",
       "activate": "Aktivieren"
+    },
+    "admin_page": {
+      "nav": "Admin",
+      "title": "Administration",
+      "section_paths": "Verzeichnisse",
+      "section_ui": "Bedienung",
+      "section_timeouts": "Zeiten",
+      "section_tags": "Tag-Import",
+      "playlistDirectory": "Playlist-Verzeichnis",
+      "ownPlaylistDirectory": "Verzeichnis eigener Playlists",
+      "trackDirectory": "Track-Verzeichnis",
+      "browse": "Auswählen",
+      "adminPassword": "Admin-Passwort",
+      "showPassword": "Passwort anzeigen",
+      "defaultPlaylistName": "Start-Playlist",
+      "none": "Keine (erste verfügbare)",
+      "showNextTrackButton": "Schaltfläche „Nächster Titel“ anzeigen",
+      "showPlayButton": "Schaltfläche „Play/Pause“ anzeigen",
+      "adminModeTimeoutSeconds": "Admin-Modus beenden nach (Sekunden)",
+      "backToWaitlistTimeoutSeconds": "Zurück zur Warteschlange nach (Sekunden)",
+      "playOwnPlaylistNowDelaySeconds": "Verzögerung „Eigene Playlist jetzt“ (Sekunden)",
+      "disabled": "Aus",
+      "artistSeparators": "Trennzeichen für Künstler (reguläre Ausdrücke)",
+      "genreSeparators": "Trennzeichen für Genres (reguläre Ausdrücke)",
+      "add_separator": "Neues Trennzeichen",
+      "add": "Hinzufügen",
+      "save": "Speichern",
+      "saved": "Gespeichert. Änderungen an Verzeichnissen laden die Bibliothek neu.",
+      "save_error": "Speichern fehlgeschlagen.",
+      "reset": "Zurücksetzen"
     }
   }
 }

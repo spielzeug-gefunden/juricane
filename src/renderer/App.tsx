@@ -4,7 +4,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { de } from 'date-fns/locale/de';
 import { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Provider, useDispatch } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import {
   Navigate,
   Route,
@@ -13,11 +13,12 @@ import {
 } from 'react-router-dom';
 import './app/i18n';
 import { useDefaultPlaylist, useMusicLibrary } from './app/queries';
-import { store } from './app/store';
+import { RootState, store } from './app/store';
 import AudioPlayerContext from './components/audio-player/AudioContext';
 import useAudioPlayer from './components/audio-player/useAudioPlayer';
 import CategoryGroupPage from './components/category/CategoryGroupPage';
 import CategoryTracksPage from './components/category/CategoryTracksPage';
+import AdminPage from './components/admin/AdminPage';
 import Main from './components/main/Main';
 import NotLoadedScreen from './components/not-loaded/NotLoadedScreen';
 import OwnPlaylist from './components/playlists/OwnPlaylist';
@@ -26,6 +27,8 @@ import useScheduledOwnPlaylist from './components/playlists/useScheduledOwnPlayl
 import CurrentTrackCover from './components/queue/CurrentTrackCover';
 import AllTracks from './components/tracks/AllTracks';
 import './sagas/music-player-saga';
+import { selectAdminMode } from './components/main/selectors';
+import { adminPageOpened } from './slices/admin-slice';
 import { setCurrentPlaylist } from './slices/music-player-slice';
 
 const darkTheme = createTheme({
@@ -35,6 +38,24 @@ const darkTheme = createTheme({
 });
 
 const queryClient = new QueryClient();
+
+function IndexRedirect() {
+  const openAdminOnStart = useSelector(
+    (state: RootState) => state.admin.openAdminOnStart
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (openAdminOnStart) dispatch(adminPageOpened());
+  }, [openAdminOnStart, dispatch]);
+
+  return <Navigate to={openAdminOnStart ? '/admin' : '/playing'} replace />;
+}
+
+function AdminRoute() {
+  const adminMode = useSelector(selectAdminMode);
+  return adminMode ? <AdminPage /> : <Navigate to="/playing" replace />;
+}
 
 function AppRoutes() {
   const { isFetched, data } = useMusicLibrary();
@@ -135,7 +156,8 @@ function AppRoutes() {
                   }
                 />
               </Route>
-              <Route index element={<Navigate to="/playing" replace />} />
+              <Route path="admin" element={<AdminRoute />} />
+              <Route index element={<IndexRedirect />} />
             </Route>
           </Routes>
         </Router>
