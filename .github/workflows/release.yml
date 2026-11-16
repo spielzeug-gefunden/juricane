@@ -28,12 +28,26 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build Windows zip
+      - name: Build
+        run: yarn build
+
+      - name: Package Windows zip
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Bei Tag-Push der Tag (z. B. v0.2.0), sonst manual-<run-id>.
+          LABEL: ${{ github.ref_type == 'tag' && github.ref_name || format('manual-{0}', github.run_id) }}
         # --win zip: gezipptes build-Ergebnis (kein NSIS-Setup)
         # --publish never: Upload übernimmt der Release-Schritt unten
-        run: yarn build && npx electron-builder build --win zip --x64 --publish never
+        # Das Zip heißt nach dem Tag: Juricane-v0.2.0-win.zip. Ist der Tag eine
+        # Versionsnummer (v1.2.3), wird sie auch als App-Version eingetragen,
+        # statt der Version aus release/app/package.json.
+        run: |
+          $buildArgs = @('-c.artifactName=Juricane-' + $env:LABEL + '-win.${ext}')
+          if ($env:LABEL -match '^v(\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?)$') {
+            $buildArgs += "-c.extraMetadata.version=$($Matches[1])"
+          }
+          npx electron-builder build --win zip --x64 --publish never @buildArgs
 
       - name: Collect artifacts
         id: artifacts
