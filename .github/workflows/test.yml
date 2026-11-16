@@ -7,28 +7,36 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      # Beide Plattformen immer zu Ende laufen lassen, auch wenn eine fehlschlägt.
+      fail-fast: false
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Install Node.js and NPM
-        uses: actions/setup-node@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: npm
+          node-version: 20
+          cache: yarn
 
       - name: yarn install
-        run: |
-          yarn
+        run: yarn install --frozen-lockfile
 
-      - name: yarn test
+      # Einzelne Schritte statt eines mehrzeiligen Skripts: Unter Windows (PowerShell)
+      # würde sonst nur der Exit-Code des letzten Befehls zählen.
+      - name: yarn package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          yarn package
-          yarn lint
-          npm exec tsc
-          yarn test
+        run: yarn package
+
+      - name: yarn lint
+        run: yarn lint
+
+      - name: Typecheck
+        run: npm exec tsc
+
+      - name: yarn test
+        run: yarn test
