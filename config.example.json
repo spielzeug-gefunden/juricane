@@ -1,8 +1,8 @@
 {
-  "playlistDirectory": "/Users/vgriebel/Documents/github/juricane/test_music/Playlisten",
-  "ownPlaylistDirectory": "/Users/vgriebel/Documents/github/juricane/test_music/eigene_playlisten",
-  "trackDirectory": "/Users/vgriebel/Documents/github/juricane/test_music",
-  "adminPassword": "test",
+  "playlistDirectory": "C:/Musik/Playlisten",
+  "ownPlaylistDirectory": "C:/Musik/eigene_playlisten",
+  "trackDirectory": "C:/Musik",
+  "adminPassword": "change-me",
   "showNextTrackButton": false,
   "showPlayButton": false,
   "defaultPlaylistName": "Playlist_Ordner_2",

@@ -75,7 +75,11 @@ yarn
 
 ### `config.json`
 
-Im Repo liegt eine Beispiel-`config.json` mit absoluten Pfaden – **an lokale Verzeichnisse anpassen** (Windows-Pfade ok).
+Die echte `config.json` ist nicht im Repo (steht in `.gitignore`). Stattdessen liegt die Vorlage `config.example.json` im Projektwurzelordner: nach `config.json` kopieren und die Pfade sowie das Admin-Passwort **an lokale Verzeichnisse anpassen** (Windows-Schreibweise mit `/`, z. B. `C:/Musik`).
+
+```powershell
+copy config.example.json config.json
+```
 
 | Feld | Bedeutung |
 |------|-----------|
@@ -166,7 +170,7 @@ release/app/            electron-builder App-Paket (Version hier)
   release.yml           Tag v* → Windows-Zip GitHub Release
   test.yml              Lint/Test/Package (Windows/Ubuntu)
   pr-build.yml          Pull Request → Windows-App als Artefakt
-config.json             Laufzeit-Konfiguration (lokal anpassen)
+config.example.json     Vorlage der Konfiguration (kopieren nach config.json, lokal anpassen)
 ```
 
 ### IPC (Auswahl)
@@ -214,7 +218,7 @@ Bei jedem Pull Request baut der Workflow **PR Build** die Windows-App. Im PR unt
 - TypeScript strict-ish (Projekt-`tsconfig`); Prefers single quotes (Prettier in `package.json`)
 - ESLint: `eslint-config-erb` / Airbnb-Basis
 - UI-Texte über i18next (`de`); neue Strings in `assets/locales`
-- Keine Secrets in `config.json` committen, die produktiv sind – Beispielpasswort nur für Dev
+- `config.json` wird nie committet (`.gitignore`); nur `config.example.json` mit neutralen Beispielwerten pflegen
 - `trackdb.json` und `.trackimages/` gehören zur Musikwurzel, nicht zwingend ins Git
 
 ---
