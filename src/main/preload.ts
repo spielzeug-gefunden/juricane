@@ -41,6 +41,9 @@ const electronHandler = {
     loadMusicLibrary(config: Config): Promise<MusicLibrary> {
       return ipcRenderer.invoke('files:loadLibrary', config);
     },
+    rebuildMusicLibrary(config: Config): Promise<MusicLibrary> {
+      return ipcRenderer.invoke('files:rebuildLibrary', config);
+    },
     loadOwnPlaylists(
       config: Config,
       library: MusicLibrary

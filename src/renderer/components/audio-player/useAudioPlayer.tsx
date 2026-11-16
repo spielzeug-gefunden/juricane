@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'renderer/app/store';
 import Player from 'renderer/audio/player';
 import { playNextTrack } from 'renderer/slices/music-player-slice';
 import { selectCurrentTrack } from '../main/selectors';
@@ -8,6 +9,11 @@ export default function useAudioPlayer() {
   const player = useRef(new Player());
   const dispatch = useDispatch();
   const currentTrack = useSelector(selectCurrentTrack);
+  const playToken = useSelector(
+    (state: RootState) => state.musicPlayer.playToken
+  );
+  const currentTrackRef = useRef(currentTrack);
+  currentTrackRef.current = currentTrack;
 
   useEffect(() => {
     const p = player.current;
@@ -30,12 +36,15 @@ export default function useAudioPlayer() {
   }, []);
 
   useEffect(() => {
-    if (!currentTrack) return;
+    const track = currentTrackRef.current;
+    if (!track) return;
 
     player.current.nextTrack(
-      `file://${encodeURI(currentTrack.url).replace('#', '%23')}`
+      `file://${encodeURI(track.url).replace(/#/g, '%23')}`
     );
-  }, [currentTrack]);
+    // Nur bei neuem Titel starten, nicht wenn das Track-Objekt nach einem
+    // Neueinlesen der Bibliothek ersetzt wird.
+  }, [playToken]);
 
   return player.current;
 }

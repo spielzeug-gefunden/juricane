@@ -3,6 +3,12 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControlLabel,
   MenuItem,
   Switch,
@@ -14,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import {
   useConfig,
   useMusicLibrary,
+  useRebuildMusicLibrary,
   useSaveConfig,
 } from 'renderer/app/queries';
 import NumberStepper from './NumberStepper';
@@ -37,9 +44,11 @@ export default function AdminPage() {
   const { data: config } = useConfig();
   const { data: library } = useMusicLibrary();
   const save = useSaveConfig();
+  const rebuild = useRebuildMusicLibrary();
 
   const [draft, setDraft] = useState<Config | undefined>(config ?? undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmRebuild, setConfirmRebuild] = useState(false);
 
   useEffect(() => {
     if (config) setDraft(config);
@@ -187,6 +196,67 @@ export default function AdminPage() {
         values={draft.genreSeparators}
         onChange={(genreSeparators) => update({ genreSeparators })}
       />
+
+      <Typography variant="h6">
+        {t('components.admin_page.section_library')}
+      </Typography>
+      {rebuild.isSuccess && (
+        <Alert severity="success">
+          {t('components.admin_page.rebuild_success', {
+            count: rebuild.data.tracks.length,
+          })}
+        </Alert>
+      )}
+      {rebuild.isError && (
+        <Alert severity="error">
+          {t('components.admin_page.rebuild_error')}
+        </Alert>
+      )}
+      {rebuild.isLoading && (
+        <Box display="flex" alignItems="center" gap={2}>
+          <CircularProgress size={28} />
+          <Typography>{t('components.admin_page.rebuild_running')}</Typography>
+        </Box>
+      )}
+      <Box>
+        <Button
+          variant="outlined"
+          size="large"
+          sx={{ minHeight: 64, minWidth: 200, fontSize: 18 }}
+          disabled={rebuild.isLoading}
+          onClick={() => setConfirmRebuild(true)}
+        >
+          {t('components.admin_page.rebuild')}
+        </Button>
+      </Box>
+      <Dialog open={confirmRebuild} onClose={() => setConfirmRebuild(false)}>
+        <DialogTitle>{t('components.admin_page.rebuild')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t('components.admin_page.rebuild_confirm')}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            size="large"
+            sx={{ minHeight: 56, minWidth: 140 }}
+            onClick={() => setConfirmRebuild(false)}
+          >
+            {t('components.admin_page.cancel')}
+          </Button>
+          <Button
+            size="large"
+            variant="contained"
+            sx={{ minHeight: 56, minWidth: 140 }}
+            onClick={() => {
+              setConfirmRebuild(false);
+              rebuild.mutate();
+            }}
+          >
+            {t('components.admin_page.rebuild_start')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {save.isSuccess && !dirty && (
         <Alert severity="success">{t('components.admin_page.saved')}</Alert>

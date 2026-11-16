@@ -107,36 +107,59 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(
-  'files:loadLibrary',
-  async (event, config: Config): Promise<MusicLibrary> => {
-    let trackDb: TrackDb;
+async function loadLibrary(config: Config): Promise<MusicLibrary> {
+  let trackDb: TrackDb;
+  try {
+    trackDb = await loadTrackDb(config.trackDirectory);
+  } catch (error) {
     try {
-      trackDb = await loadTrackDb(config.trackDirectory);
-    } catch (error) {
-      try {
-        await buildTrackDb(
-          config.trackDirectory,
-          config.artistSeparators,
-          config.genreSeparators
-        );
-      } catch (err) {
-        console.log(err);
-        throw err;
-      }
-      trackDb = await loadTrackDb(config.trackDirectory);
+      await buildTrackDb(
+        config.trackDirectory,
+        config.artistSeparators,
+        config.genreSeparators
+      );
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
+    trackDb = await loadTrackDb(config.trackDirectory);
+  }
 
-    const playlists = await loadAllPlaylistsFromDirectory(
-      config.playlistDirectory
-    );
+  const playlists = await loadAllPlaylistsFromDirectory(
+    config.playlistDirectory
+  );
 
-    const playlistsMerged = createCategoryInfoForPlaylists(
-      playlists,
-      trackDb,
-      config.trackDirectory
-    );
-    return { ...trackDb, playlists: playlistsMerged };
+  const playlistsMerged = createCategoryInfoForPlaylists(
+    playlists,
+    trackDb,
+    config.trackDirectory
+  );
+  return { ...trackDb, playlists: playlistsMerged };
+}
+
+ipcMain.handle('files:loadLibrary', (event, config: Config) =>
+  loadLibrary(config)
+);
+
+let rebuilding = false;
+
+// Baut die trackdb.json neu auf und lädt die Bibliothek neu. Bei einem Fehler
+// bleibt die bisherige trackdb.json erhalten (siehe buildTrackDb).
+ipcMain.handle(
+  'files:rebuildLibrary',
+  async (event, config: Config): Promise<MusicLibrary> => {
+    if (rebuilding) throw new Error('Rebuild already running');
+    rebuilding = true;
+    try {
+      await buildTrackDb(
+        config.trackDirectory,
+        config.artistSeparators,
+        config.genreSeparators
+      );
+      return await loadLibrary(config);
+    } finally {
+      rebuilding = false;
+    }
   }
 );
 
