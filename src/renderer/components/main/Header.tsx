@@ -146,7 +146,11 @@ export default function Header() {
           src={logo}
           height="100%"
           alt="Lienke SounDevices"
-          onDoubleClick={handleToggleAdminMode}
+          onDoubleClick={
+            config?.enableHiddenAdminAccess === false
+              ? undefined
+              : handleToggleAdminMode
+          }
         />
       </Box>
       {adminMode && config?.adminModeTimeoutSeconds && (

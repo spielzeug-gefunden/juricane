@@ -90,6 +90,7 @@ copy config.example.json config.json
 | `defaultPlaylistName` | Start-Playlist (Name ohne `.m3u`) |
 | `showPlayButton` / `showNextTrackButton` | Steuerungselemente in der UI |
 | `artistSeparators` / `genreSeparators` | Split-Regeln beim Tag-Import |
+| `enableHiddenAdminAccess` | Versteckten Administrationszugang (Doppelklick auf das Logo) aktivieren; optional, Default `true` |
 | `adminModeTimeoutSeconds` | Auto-Logout Admin |
 | `backToWaitlistTimeoutSeconds` | Idle → zurück zur Queue-Ansicht |
 | `playOwnPlaylistNowDelaySeconds` | Verzögerung „eigene Playlist jetzt“ |
