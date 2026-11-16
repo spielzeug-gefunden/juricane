@@ -169,8 +169,8 @@ src/
 release/app/            electron-builder App-Paket (Version hier)
 .github/workflows/
   release.yml           Tag v* → Windows-Zip GitHub Release
-  test.yml              Lint/Test/Package (Windows/Ubuntu)
-  pr-build.yml          Pull Request → Windows-App als Artefakt
+  test.yml              Lint/Typecheck/Build/Test (Ubuntu)
+  pr-build.yml          Windows-Build; bei Pull Requests die App als Artefakt
 config.example.json     Vorlage der Konfiguration (kopieren nach config.json, lokal anpassen)
 ```
 

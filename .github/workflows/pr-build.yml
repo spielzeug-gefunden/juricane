@@ -1,9 +1,15 @@
-# Baut bei jedem Pull Request die Windows-App und hängt sie als Artefakt an den Lauf.
-# Zweck: Änderungen vor dem Merge ausprobieren, ohne Node/Yarn/Git zu installieren.
+# Baut und paketiert die Windows-App. Bei einem Pull Request hängt sie als
+# Artefakt am Lauf.
+# Zweck: prüfen, dass die App unter Windows baut, und Änderungen vor dem Merge
+# ausprobieren, ohne Node/Yarn/Git zu installieren.
 # Erstellt kein Release und keinen Tag (dafür ist release.yml zuständig).
 name: PR Build
 
+# push auf main prüft den Stand nach dem Merge und füllt den Cache der
+# Abhängigkeiten, den neue Pull Requests dann mitbenutzen.
 on:
+  push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -11,8 +17,8 @@ permissions:
 
 # Ein neuer Push auf denselben PR bricht den noch laufenden Build ab.
 concurrency:
-  group: pr-build-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: pr-build-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   windows-app:
@@ -27,9 +33,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+
+      # Die fertig installierten Abhängigkeiten cachen statt des Yarn-Caches:
+      # Bei einem Treffer entfällt "yarn install" ganz. .erb/dll entsteht im
+      # postinstall und gehört deshalb dazu.
+      - name: Cache dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            release/app/node_modules
+            .erb/dll
+          key: deps-${{ runner.os }}-node20-${{ hashFiles('package.json', 'yarn.lock', 'release/app/package.json', 'release/app/yarn.lock') }}
 
       - name: Install dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
 
       - name: Build
@@ -41,6 +60,7 @@ jobs:
         run: npx electron-builder build --win dir --x64 --publish never
 
       - name: Upload app
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: juricane-windows-pr-${{ github.event.pull_request.number }}

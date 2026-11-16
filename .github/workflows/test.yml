@@ -1,16 +1,28 @@
+# Prüft den Code: Lint, Typecheck, Build und Tests.
+# Läuft nur auf Ubuntu, weil diese Schritte auf jedem System dasselbe Ergebnis
+# liefern. Dass die App unter Windows baut und sich paketieren lässt, prüft
+# pr-build.yml.
 name: Test
 
-on: [push, pull_request]
+# push nur auf main: Für Pull Requests läuft der Workflow über pull_request,
+# sonst würde jeder PR-Branch doppelt geprüft.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Ein neuer Push auf denselben PR bricht den noch laufenden Lauf ab.
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      # Beide Plattformen immer zu Ende laufen lassen, auch wenn eine fehlschlägt.
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Check out Git repository
@@ -20,23 +32,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: yarn
+
+      # Die fertig installierten Abhängigkeiten cachen statt des Yarn-Caches:
+      # Bei einem Treffer entfällt "yarn install" ganz. .erb/dll entsteht im
+      # postinstall und gehört deshalb dazu.
+      - name: Cache dependencies
+        id: deps
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            release/app/node_modules
+            .erb/dll
+          key: deps-${{ runner.os }}-node20-${{ hashFiles('package.json', 'yarn.lock', 'release/app/package.json', 'release/app/yarn.lock') }}
 
       - name: yarn install
+        if: steps.deps.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile
-
-      # Einzelne Schritte statt eines mehrzeiligen Skripts: Unter Windows (PowerShell)
-      # würde sonst nur der Exit-Code des letzten Befehls zählen.
-      - name: yarn package
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: yarn package
 
       - name: yarn lint
         run: yarn lint
 
       - name: Typecheck
         run: npm exec tsc
+
+      # Die Tests brauchen einen vorhandenen Build.
+      - name: yarn build
+        run: yarn build
 
       - name: yarn test
         run: yarn test
