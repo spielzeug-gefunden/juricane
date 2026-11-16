@@ -103,7 +103,7 @@ Start mit expliziter Config:
 # die App liest standardmäßig "config.json" im Arbeitsverzeichnis
 ```
 
-Fehlt die Datei (gesucht im Programmverzeichnis bzw. per `--config=…`), fragt die App, ob eine vorhandene Datei importiert (wird ins Programmverzeichnis kopiert) oder eine neue Konfiguration mit Standardwerten angelegt werden soll. Bei „Neu anlegen“ wird der Admin-Modus freigeschaltet und die Admin-Seite geöffnet. Alle Parameter lassen sich dort über den Menüpunkt „Admin“ (nur im Admin-Modus sichtbar) bearbeiten.
+Fehlt die Datei (gesucht im Programmverzeichnis bzw. per `--config=…`), fragt die App, ob eine vorhandene Datei importiert (wird ins Programmverzeichnis kopiert) oder eine neue Konfiguration mit der Vorlage `config.example.json` angelegt werden soll. Bei „Neu anlegen“ wird der Admin-Modus freigeschaltet und die Admin-Seite geöffnet. Alle Parameter lassen sich dort über den Menüpunkt „Admin“ (nur im Admin-Modus sichtbar) bearbeiten.
 
 ### Empfohlene Test-Musikstruktur
 

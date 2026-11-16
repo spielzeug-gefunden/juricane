@@ -82,7 +82,7 @@ ipcMain.handle('config:import', async (): Promise<Config | null> => {
 
 // Neue Konfiguration aus der Vorlage anlegen.
 ipcMain.handle('config:createDefault', async (): Promise<Config> => {
-  const created = createDefaultConfig(app.getPath('music'));
+  const created = createDefaultConfig();
   await writeConfigFile(getConfigPath(), created);
   return created;
 });

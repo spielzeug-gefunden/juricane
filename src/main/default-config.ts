@@ -1,19 +1,18 @@
 import Config from 'config';
-import path from 'path';
 
 /**
- * Vorlage für eine neu angelegte Konfiguration (entspricht der Beispiel-
- * config.json, aber mit Verzeichnissen unterhalb des Musikordners des Nutzers).
+ * Vorlage für eine neu angelegte Konfiguration. Muss mit der
+ * `config.example.json` im Projektwurzelordner übereinstimmen.
  */
-export default function createDefaultConfig(musicDirectory: string): Config {
+export default function createDefaultConfig(): Config {
   return {
-    playlistDirectory: path.join(musicDirectory, 'Playlisten'),
-    ownPlaylistDirectory: path.join(musicDirectory, 'eigene_playlisten'),
-    trackDirectory: musicDirectory,
-    adminPassword: 'test',
+    playlistDirectory: 'C:/Musik/Playlisten',
+    ownPlaylistDirectory: 'C:/Musik/eigene_playlisten',
+    trackDirectory: 'C:/Musik',
+    adminPassword: 'change-me',
     showNextTrackButton: false,
     showPlayButton: false,
-    defaultPlaylistName: '',
+    defaultPlaylistName: 'Playlist_Ordner_2',
     artistSeparators: [
       ' featuring ',
       ' ft\\. ',
