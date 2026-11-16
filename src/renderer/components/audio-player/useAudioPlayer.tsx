@@ -40,7 +40,7 @@ export default function useAudioPlayer() {
     if (!track) return;
 
     player.current.nextTrack(
-      `file://${encodeURI(track.url).replace('#', '%23')}`
+      `file://${encodeURI(track.url).replace(/#/g, '%23')}`
     );
     // Nur bei neuem Titel starten, nicht wenn das Track-Objekt nach einem
     // Neueinlesen der Bibliothek ersetzt wird.
