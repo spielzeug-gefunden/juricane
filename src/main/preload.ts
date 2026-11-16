@@ -24,7 +24,19 @@ const electronHandler = {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
     loadConfig(): Promise<Config | null> {
-      return ipcRenderer.invoke('dialog:loadConfig');
+      return ipcRenderer.invoke('config:load');
+    },
+    importConfig(): Promise<Config | null> {
+      return ipcRenderer.invoke('config:import');
+    },
+    createDefaultConfig(): Promise<Config> {
+      return ipcRenderer.invoke('config:createDefault');
+    },
+    saveConfig(config: Config): Promise<Config> {
+      return ipcRenderer.invoke('config:save', config);
+    },
+    selectDirectory(current?: string): Promise<string | null> {
+      return ipcRenderer.invoke('dialog:selectDirectory', current);
     },
     loadMusicLibrary(config: Config): Promise<MusicLibrary> {
       return ipcRenderer.invoke('files:loadLibrary', config);

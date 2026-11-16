@@ -18,6 +18,8 @@ import {
   OwnPlaylistConfig,
   TrackDb,
 } from 'renderer/types';
+import { readConfigFile, writeConfigFile } from './config-file';
+import createDefaultConfig from './default-config';
 import buildTrackDb, { loadTrackDb } from './db-builder/track-db-builder';
 import {
   deleteOwnPlaylist,
@@ -44,25 +46,66 @@ let mainWindow: BrowserWindow | null = null;
 //   app.exit(0);
 // }
 
-ipcMain.handle('dialog:loadConfig', async () => {
-  const filename = app.commandLine.getSwitchValue('config') || 'config.json';
+/** Pfad der config.json: CLI-Switch, sonst im Programmverzeichnis. */
+const getConfigPath = () => {
+  const fromSwitch = app.commandLine.getSwitchValue('config');
+  if (fromSwitch) return path.resolve(fromSwitch);
+  const baseDir = app.isPackaged
+    ? path.dirname(process.execPath)
+    : process.cwd();
+  return path.join(baseDir, 'config.json');
+};
 
-  let config: string;
+// Liefert null, wenn (noch) keine config.json existiert.
+ipcMain.handle('config:load', async (): Promise<Config | null> => {
   try {
-    config = await fs.readFile(filename, 'utf8');
+    return await readConfigFile(getConfigPath());
   } catch (error) {
-    const result = await dialog.showOpenDialog(mainWindow!, {
-      properties: ['openFile'],
-      title: 'Bitte öffne die config.json Datei',
-    });
-
-    if (result.canceled) return null;
-
-    config = await fs.readFile(result.filePaths[0], 'utf8');
+    if ((error as { code?: string }).code === 'ENOENT') return null;
+    throw error;
   }
-
-  return JSON.parse(config);
 });
+
+// Externe Datei auswählen und ins Programmverzeichnis kopieren.
+ipcMain.handle('config:import', async (): Promise<Config | null> => {
+  const result = await dialog.showOpenDialog(mainWindow!, {
+    properties: ['openFile'],
+    title: 'Bitte öffne die config.json Datei',
+    filters: [{ name: 'JSON', extensions: ['json'] }],
+  });
+  if (result.canceled || result.filePaths.length === 0) return null;
+
+  const imported = await readConfigFile(result.filePaths[0]);
+  await writeConfigFile(getConfigPath(), imported);
+  return imported;
+});
+
+// Neue Konfiguration aus der Vorlage anlegen.
+ipcMain.handle('config:createDefault', async (): Promise<Config> => {
+  const created = createDefaultConfig();
+  await writeConfigFile(getConfigPath(), created);
+  return created;
+});
+
+ipcMain.handle(
+  'config:save',
+  async (event, config: Config): Promise<Config> => {
+    await writeConfigFile(getConfigPath(), config);
+    return config;
+  }
+);
+
+ipcMain.handle(
+  'dialog:selectDirectory',
+  async (event, current?: string): Promise<string | null> => {
+    const result = await dialog.showOpenDialog(mainWindow!, {
+      properties: ['openDirectory', 'createDirectory'],
+      defaultPath: current || undefined,
+    });
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
+  }
+);
 
 ipcMain.handle(
   'files:loadLibrary',
