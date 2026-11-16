@@ -1,5 +1,5 @@
 import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
-import { Track } from 'renderer/types';
+import { MusicLibrary, Track } from 'renderer/types';
 import { reorder } from 'renderer/utils/dragndrop';
 
 type CurrentPlaylist = {
@@ -14,6 +14,8 @@ export type MusicPlayerState = {
   playedTracksHistory: number[];
   waitlist: Track[];
   libraryPath: string | null;
+  /** Wird bei jedem Start eines Titels erhöht; löst die Wiedergabe aus. */
+  playToken: number;
 };
 
 const initialState: MusicPlayerState = {
@@ -22,6 +24,7 @@ const initialState: MusicPlayerState = {
   playedTracksHistory: [],
   waitlist: [],
   libraryPath: null,
+  playToken: 0,
 };
 
 export const musicPlayerSlice = createSlice({
@@ -36,6 +39,7 @@ export const musicPlayerSlice = createSlice({
     },
     setCurrentTrack(state, { payload }: PayloadAction<Track>) {
       state.currentTrack = payload;
+      state.playToken += 1;
 
       if (state.waitlist.length > 0 && state.waitlist[0].id === payload.id) {
         state.waitlist = state.waitlist.slice(1);
@@ -57,10 +61,47 @@ export const musicPlayerSlice = createSlice({
     ) {
       state.waitlist = reorder(state.waitlist, startIndex, endIndex);
     },
+    // Nach dem Neuaufbau der Bibliothek ändern sich die Track-IDs. Titel werden
+    // über ihre URL wiedergefunden; nicht mehr vorhandene Titel fliegen aus
+    // Warteschlange und Verlauf. Der laufende Titel bleibt unverändert, falls
+    // er nicht mehr gefunden wird. playToken bleibt gleich, die Wiedergabe
+    // wird also nicht neu gestartet.
+    remapTracksToLibrary(
+      state,
+      {
+        payload: { oldLibrary, newLibrary },
+      }: PayloadAction<{ oldLibrary: MusicLibrary; newLibrary: MusicLibrary }>
+    ) {
+      const newByUrl = new Map(newLibrary.tracks.map((x) => [x.url, x]));
+      const oldUrlById = new Map(oldLibrary.tracks.map((x) => [x.id, x.url]));
+
+      if (state.currentTrack) {
+        state.currentTrack =
+          newByUrl.get(state.currentTrack.url) ?? state.currentTrack;
+      }
+      if (state.currentPlaylist) {
+        state.currentPlaylist.tracks = state.currentPlaylist.tracks.flatMap(
+          (x) => {
+            const t = newByUrl.get(x.url);
+            return t ? [t] : [];
+          }
+        );
+      }
+      state.waitlist = state.waitlist.flatMap((x) => {
+        const t = newByUrl.get(x.url);
+        return t ? [t] : [];
+      });
+      state.playedTracksHistory = state.playedTracksHistory.flatMap((id) => {
+        const url = oldUrlById.get(id);
+        const t = url === undefined ? undefined : newByUrl.get(url);
+        return t ? [t.id] : [];
+      });
+    },
     enqueueTracksAndPlayFirst(state, { payload }: PayloadAction<Track[]>) {
       if (payload.length > 0) {
         // eslint-disable-next-line prefer-destructuring
         state.currentTrack = payload[0];
+        state.playToken += 1;
         state.playedTracksHistory = [
           payload[0].id,
           ...state.playedTracksHistory,
@@ -85,6 +126,7 @@ export const {
   removeFromWaitlist,
   waitlistReorder,
   enqueueTracksAndPlayFirst,
+  remapTracksToLibrary,
 } = musicPlayerSlice.actions;
 
 export default musicPlayerSlice.reducer;

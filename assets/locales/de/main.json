@@ -62,7 +62,16 @@
       "save": "Speichern",
       "saved": "Gespeichert. Änderungen an Verzeichnissen laden die Bibliothek neu.",
       "save_error": "Speichern fehlgeschlagen.",
-      "reset": "Zurücksetzen"
+      "reset": "Zurücksetzen",
+      "section_library": "Bibliothek",
+      "rebuild": "Bibliothek neu einlesen",
+      "rebuild_confirm": "Alle Titel im Track-Verzeichnis werden neu eingelesen. Bei großen Sammlungen kann das einige Minuten dauern. Fortfahren?",
+      "rebuild_start": "Einlesen starten",
+      "cancel": "Abbrechen",
+      "rebuild_running": "Bibliothek wird eingelesen …",
+      "rebuild_success_one": "Bibliothek neu eingelesen: {{count}} Titel gefunden.",
+      "rebuild_success_other": "Bibliothek neu eingelesen: {{count}} Titel gefunden.",
+      "rebuild_error": "Einlesen fehlgeschlagen. Die bisherige Titeldatenbank bleibt erhalten."
     }
   }
 }

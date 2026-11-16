@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import Config from 'config';
+import { useDispatch } from 'react-redux';
+import { remapTracksToLibrary } from 'renderer/slices/music-player-slice';
 import { OwnPlaylist, OwnPlaylistConfig } from 'renderer/types';
 
 export const useConfig = () => {
@@ -68,6 +70,31 @@ export const useMusicLibrary = () => {
       enabled: !!config,
     }
   );
+};
+
+export const useRebuildMusicLibrary = () => {
+  const { data: config } = useConfig();
+  const { data: oldLibrary } = useMusicLibrary();
+  const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+
+  return useMutation({
+    mutationFn: () => {
+      if (!config) {
+        throw new Error('no config');
+      }
+      return window.electron.ipcRenderer.rebuildMusicLibrary(config);
+    },
+    onSuccess: (library) => {
+      // Track-IDs ändern sich beim Neuaufbau: Warteschlange anhand der URL
+      // auf die neuen Titel abbilden.
+      if (oldLibrary) {
+        dispatch(remapTracksToLibrary({ oldLibrary, newLibrary: library }));
+      }
+      queryClient.setQueryData(['musicLibrary', config], library);
+      queryClient.invalidateQueries('ownPlaylists');
+    },
+  });
 };
 
 export const useUpdateOwnPlaylist = () => {
