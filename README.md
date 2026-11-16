@@ -165,6 +165,7 @@ release/app/            electron-builder App-Paket (Version hier)
 .github/workflows/
   release.yml           Tag v* → Windows-Zip GitHub Release
   test.yml              Lint/Test/Package (Windows/Ubuntu)
+  pr-build.yml          Pull Request → Windows-App als Artefakt
 config.json             Laufzeit-Konfiguration (lokal anpassen)
 ```
 
@@ -201,6 +202,10 @@ git push origin v0.1.0
 Manuell: Actions → **Release** → **Run workflow**.
 
 Version der App: `release/app/package.json` (`version`).
+
+### Pull Request ausprobieren
+
+Bei jedem Pull Request baut der Workflow **PR Build** die Windows-App. Im PR unter **Checks** → **PR Build** → **Summary** steht sie unter „Artifacts“ als `juricane-windows-pr-<Nummer>` zum Download (GitHub-Anmeldung nötig, 7 Tage verfügbar). Zip entpacken und `Juricane.exe` starten; eine `config.json` muss im selben Ordner liegen oder wird per Dialog ausgewählt.
 
 ---
 
