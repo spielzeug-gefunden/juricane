@@ -8,6 +8,7 @@ type Config = {
   defaultPlaylistName: string;
   artistSeparators: string[];
   genreSeparators: string[];
+  enableHiddenAdminAccess?: boolean;
   adminModeTimeoutSeconds: number | undefined;
   backToWaitlistTimeoutSeconds: number | undefined;
   playOwnPlaylistNowDelaySeconds: number;
