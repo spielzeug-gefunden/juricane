@@ -89,7 +89,7 @@ export default function Footer() {
             </Box>
           </Box>
           <Box display="flex" alignItems="center" ml={3}>
-            {(config?.showNextTrackButton || adminMode) && (
+            {(config?.showPlayButton || adminMode) && (
               <IconButton
                 size="large"
                 onClick={() =>
@@ -103,7 +103,7 @@ export default function Footer() {
                 )}
               </IconButton>
             )}
-            {(config?.showPlayButton || adminMode) && (
+            {(config?.showNextTrackButton || adminMode) && (
               <IconButton onClick={() => dispatch(playNextTrack())}>
                 <SkipNextIcon />
               </IconButton>
