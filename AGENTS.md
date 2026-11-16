@@ -43,7 +43,7 @@ Dateien unter `.github/workflows/` kannst du nicht ändern: Die Claude-GitHub-Ap
 ## Nicht anfassen (außer das Issue verlangt es ausdrücklich)
 
 - `.erb/` – Webpack- und Build-Skripte der Boilerplate
-- `config.json` – Beispielkonfiguration mit lokalen Pfaden; keine echten Pfade oder Passwörter committen
+- `config.example.json` – Vorlage der Konfiguration mit neutralen Beispielpfaden; `config.json` ist lokal, steht in `.gitignore` und wird **nie** committet (keine echten Pfade oder Passwörter)
 - `release/app/package.json` – enthält die App-Version; Versionssprünge macht ein Mensch
 - `yarn.lock` – nur ändern, wenn das Issue eine neue oder geänderte Abhängigkeit verlangt
 
