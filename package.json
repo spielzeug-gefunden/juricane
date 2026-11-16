@@ -12,13 +12,13 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/Anapher/juricane",
+  "homepage": "https://github.com/spielzeug-gefunden/juricane",
   "bugs": {
-    "url": "https://github.com/Anapher/juricane/issues"
+    "url": "https://github.com/spielzeug-gefunden/juricane/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Anapher/juricane.git"
+    "url": "git+https://github.com/spielzeug-gefunden/juricane.git"
   },
   "author": {
     "name": "Anapher"
@@ -244,7 +244,7 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "anapher",
+      "owner": "spielzeug-gefunden",
       "repo": "juricane"
     }
   },
