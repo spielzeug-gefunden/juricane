@@ -23,7 +23,7 @@ Paketmanager ist **Yarn classic (v1)**, Node 18 oder 20. Nicht `npm install` ver
 | `yarn test` | Jest – benötigt einen vorhandenen Build, also vorher `yarn build` |
 | `yarn start` | App im Dev-Modus (braucht eine grafische Oberfläche) |
 
-Vor jedem PR müssen `yarn lint`, `npx tsc --noEmit`, `yarn build` und `yarn test` fehlerfrei laufen. Die CI (`.github/workflows/test.yml`) prüft dasselbe auf macOS und Ubuntu.
+Vor jedem PR müssen `yarn lint`, `npx tsc --noEmit`, `yarn build` und `yarn test` fehlerfrei laufen. Die CI (`.github/workflows/test.yml`) prüft dasselbe auf Windows und Ubuntu.
 
 Die App lässt sich in einer Cloud-Umgebung ohne Display nicht sinnvoll starten. Schreibe im PR ausdrücklich, was du nur über Tests und Build geprüft hast und was ein Mensch in der laufenden App ansehen sollte.
 
@@ -36,9 +36,12 @@ Die App lässt sich in einer Cloud-Umgebung ohne Display nicht sinnvoll starten.
 - Alle sichtbaren Texte laufen über i18next. Neue Texte in `assets/locales/de` eintragen, nicht fest im Code.
 - Für neue Logik ohne UI (Parser, Loader, Hilfsfunktionen) einen Jest-Test neben die Datei legen (`*.test.ts`), wie `src/main/playlist-loader/music-tag-loader.test.ts`.
 
+## Workflows
+
+Dateien unter `.github/workflows/` kannst du nicht ändern: Die Claude-GitHub-App hat dafür kein Schreibrecht, GitHub lehnt den Push ab. Verlangt ein Issue eine Workflow-Änderung, setze den Rest um und beschreibe die nötige Workflow-Änderung im Issue bzw. PR als Vorschlag, den ein Mensch übernimmt.
+
 ## Nicht anfassen (außer das Issue verlangt es ausdrücklich)
 
-- `.github/workflows/` – CI und Release
 - `.erb/` – Webpack- und Build-Skripte der Boilerplate
 - `config.json` – Beispielkonfiguration mit lokalen Pfaden; keine echten Pfade oder Passwörter committen
 - `release/app/package.json` – enthält die App-Version; Versionssprünge macht ein Mensch

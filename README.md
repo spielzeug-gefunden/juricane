@@ -164,7 +164,7 @@ src/
 release/app/            electron-builder App-Paket (Version hier)
 .github/workflows/
   release.yml           Tag v* → Windows-Zip GitHub Release
-  test.yml              Lint/Test/Package (macOS/Ubuntu)
+  test.yml              Lint/Test/Package (Windows/Ubuntu)
 config.json             Laufzeit-Konfiguration (lokal anpassen)
 ```
 
