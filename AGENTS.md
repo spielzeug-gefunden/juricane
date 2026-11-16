@@ -23,7 +23,7 @@ Paketmanager ist **Yarn classic (v1)**, Node 18 oder 20. Nicht `npm install` ver
 | `yarn test` | Jest – benötigt einen vorhandenen Build, also vorher `yarn build` |
 | `yarn start` | App im Dev-Modus (braucht eine grafische Oberfläche) |
 
-Vor jedem PR müssen `yarn lint`, `npx tsc --noEmit`, `yarn build` und `yarn test` fehlerfrei laufen. Die CI (`.github/workflows/test.yml`) prüft dasselbe auf Windows und Ubuntu.
+Vor jedem PR müssen `yarn lint`, `npx tsc --noEmit`, `yarn build` und `yarn test` fehlerfrei laufen. Die CI prüft dasselbe auf Ubuntu (`.github/workflows/test.yml`) und baut zusätzlich die Windows-App (`.github/workflows/pr-build.yml`).
 
 Die App lässt sich in einer Cloud-Umgebung ohne Display nicht sinnvoll starten. Schreibe im PR ausdrücklich, was du nur über Tests und Build geprüft hast und was ein Mensch in der laufenden App ansehen sollte.
 
