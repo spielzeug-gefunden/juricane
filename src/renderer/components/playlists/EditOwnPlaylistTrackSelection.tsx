@@ -62,7 +62,7 @@ function rowContent(
       </TableCell>
       <TableCell>
         <Box display="flex" alignItems="center">
-          <TrackImage size={48} track={row} forceSize />
+          <TrackImage size={48} track={row} forceSize zoomable />
           <Box ml={2}>{row.title}</Box>
         </Box>
       </TableCell>
