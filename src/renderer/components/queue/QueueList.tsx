@@ -58,7 +58,7 @@ export default function QueueList({
                       <TableCell>{i + 1}</TableCell>
                       <TableCell sx={{ p: 1 }}>
                         <Stack direction="row" alignItems="center" spacing={2}>
-                          <TrackImage size={48} forceSize track={x} />
+                          <TrackImage size={48} forceSize track={x} zoomable />
                           <div>
                             <span>{x.title}</span>
                             <ArtistChips
