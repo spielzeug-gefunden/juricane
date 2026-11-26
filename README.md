@@ -2,6 +2,8 @@
 
 Desktop-Jukebox (Electron) zum Durchstöbern einer lokalen Musikbibliothek, Abspielen über eine Warteschlange und Verwalten eigener Playlists – typischerweise als Touch-/Kiosk-Oberfläche.
 
+> **Änderungen wünschen, ohne selbst zu programmieren?** Die Anleitung [Vom Wunsch zum Release](./VOM-WUNSCH-ZUM-RELEASE.md) beschreibt Schritt für Schritt, wie aus einem Issue eine neue Version zum Herunterladen wird.
+
 Dieses Repository ist der Fork [spielzeug-gefunden/juricane](https://github.com/spielzeug-gefunden/juricane). Basis ist [electron-react-boilerplate](https://github.com/electron-react-boilerplate/electron-react-boilerplate).
 
 ---
